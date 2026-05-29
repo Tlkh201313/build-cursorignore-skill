@@ -9,10 +9,7 @@ description: Scans the current project and writes .cursorignore and .cursorindex
 
 Follow [references/ignore-checklist.md](references/ignore-checklist.md):
 
-1. **Phase 0–1:** scan + plan in chat — **no disk writes**
-2. **Wait for user OK**
-3. **Phase 2:** write `.cursorignore` / `.cursorindexingignore` on the target repo only
-4. **Phase 3:** closeout report
+1. **Single phase:** scan repo, write files, show report — all in one go.
 
 Never write ignore files into this skill’s source tree (`SKILL.md` + `references/` + `assets/` at repo root).
 
