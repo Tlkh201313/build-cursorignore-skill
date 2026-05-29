@@ -38,12 +38,12 @@ Details: [OVERVIEW.md](OVERVIEW.md) · [SKILL.md](SKILL.md)
 
 **Windows (PowerShell):**
 ```powershell
-irm https://raw.githubusercontent.com/Tlkh201313/build-cursorignore/main/scripts/install.ps1 | iex
+irm https://raw.githubusercontent.com/Tlkh201313/build-cursorignore-skill/main/scripts/install.ps1 | iex
 ```
 
 **macOS / Linux (Bash):**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Tlkh201313/build-cursorignore/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Tlkh201313/build-cursorignore-skill/main/scripts/install.sh | bash
 ```
 
 Or [manual install](references/install.md) — flat copy to `~/.cursor/skills/build-cursorignore/`

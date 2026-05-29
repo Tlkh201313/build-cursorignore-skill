@@ -7,7 +7,7 @@ set -e
 SKILL_NAME="build-cursorignore"
 CURSOR_SKILLS_DIR="$HOME/.cursor/skills"
 INSTALL_DIR="$CURSOR_SKILLS_DIR/$SKILL_NAME"
-REPO_URL="https://github.com/Tlkh201313/build-cursorignore"
+REPO_URL="https://github.com/Tlkh201313/build-cursorignore-skill"
 
 echo "Installing $SKILL_NAME..."
 

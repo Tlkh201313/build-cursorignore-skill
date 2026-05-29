@@ -6,7 +6,7 @@ $ErrorActionPreference = "Stop"
 $SKILL_NAME = "build-cursorignore"
 $CURSOR_SKILLS_DIR = "$env:USERPROFILE\.cursor\skills"
 $INSTALL_DIR = "$CURSOR_SKILLS_DIR\$SKILL_NAME"
-$REPO_URL = "https://github.com/Tlkh201313/build-cursorignore"
+$REPO_URL = "https://github.com/Tlkh201313/build-cursorignore-skill"
 
 Write-Host "Installing $SKILL_NAME..." -ForegroundColor Cyan
 
