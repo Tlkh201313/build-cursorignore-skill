@@ -50,6 +50,18 @@ Or [manual install](references/install.md) — flat copy to `~/.cursor/skills/bu
 
 **Then restart Cursor**
 
+**Update the skill (pull latest changes)**
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/Tlkh201313/build-cursorignore-skill/master/scripts/update.ps1 | iex
+```
+
+**macOS / Linux (Bash):**
+```bash
+curl -fsSL https://raw.githubusercontent.com/Tlkh201313/build-cursorignore-skill/master/scripts/update.sh | bash
+```
+
 **Generate ignore files later (on your app repo)**
 
 3. Open **your app** repo root in Cursor **Agent**

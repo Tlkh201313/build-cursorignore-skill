@@ -64,6 +64,34 @@ cp -R . ~/.cursor/skills/build-cursorignore/
 
 ---
 
+## Update
+
+### Quick Update (Recommended)
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/Tlkh201313/build-cursorignore-skill/master/scripts/update.ps1 | iex
+```
+
+**macOS / Linux (Bash):**
+```bash
+curl -fsSL https://raw.githubusercontent.com/Tlkh201313/build-cursorignore-skill/master/scripts/update.sh | bash
+```
+
+### Manual Update
+
+```bash
+# Navigate to the skill directory
+cd ~/.cursor/skills/build-cursorignore
+
+# Pull latest changes
+git pull
+```
+
+Restart Cursor after updating.
+
+---
+
 ## Verify Installation
 
 After restarting Cursor:
