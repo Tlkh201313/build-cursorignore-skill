@@ -1,0 +1,74 @@
+# build-cursorignore
+# --- build-cursorignore ---
+# Baseline .cursorignore — copy only patterns that exist and are NOT in .gitignore
+# See references/patterns-catalog.md and references/CURSORIGNORE-FORMAT.md
+
+# Dependencies
+node_modules/
+.venv/
+venv/
+vendor/
+__pycache__/
+
+# Build output
+dist/
+build/
+out/
+.next/
+.nuxt/
+.svelte-kit/
+target/
+*.pyc
+*.class
+
+# Cache
+.cache/
+.parcel-cache/
+.turbo/
+.eslintcache
+*.tsbuildinfo
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# Media and binary assets (add protection ! block below — see SKILL.md)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.webp
+*.mp4
+*.pdf
+*.ttf
+*.woff
+*.woff2
+
+# Logs
+*.log
+logs/
+
+# Coverage
+coverage/
+.nyc_output/
+htmlcov/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+
+# --- build-cursorignore: do not block editable source ---
+!**/src/**
+!**/app/**
+!**/*.test.*
+!**/*.spec.*
+!**/.env.example
+!**/README.md
+!**/docs/**
+!tailwind.config.*
+!vite.config.*
+!tsconfig.json
+!next.config.*
+
+# --- end build-cursorignore ---

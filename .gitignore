@@ -1,0 +1,171 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Local agent state
+.claude/
+.awakened/
+config.json
+
+# Obsidian
+.obsidian/
+
+# Target-repo outputs — create later via /build-cursorignore on app repos, not in this bundle
+.cursorignore
+.cursorindexingignore
+
+# Dependencies (if accidentally present)
+node_modules/
+.pnpm-store/
+.venv/
+venv/
+vendor/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.yarn/cache/
+.yarn/install-state.gz
+.yarn/unplugged/
+.bun/
+.deno/
+
+# Build output
+dist/
+build/
+out/
+.next/
+.nuxt/
+.svelte-kit/
+target/
+*.pyc
+*.class
+*.exe
+*.dll
+*.so
+*.dylib
+*.wasm
+
+# Caches
+.cache/
+.parcel-cache/
+.turbo/
+.nx/
+.eslintcache
+*.tsbuildinfo
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.tox/
+.nox/
+.hypothesis/
+.sass-cache/
+.webpack/
+.vite/
+.nyc_output/
+htmlcov/
+coverage/
+.coverage
+*.cover
+.changeset/
+
+# Logs & temp
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.tmp
+*.temp
+tmp/
+temp/
+
+# Media & binaries (large files)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.webp
+*.svg
+*.mp4
+*.webm
+*.mp3
+*.wav
+*.pdf
+*.zip
+*.tar
+*.gz
+*.7z
+*.ttf
+*.woff
+*.woff2
+*.eot
+*.map
+*.min.js
+*.min.css
+*.asar
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# CI/CD
+.github/.cache/
+artifacts/
+test-results/
+.gitlab/
+
+# Terraform (if present)
+.terraform/
+*.tfstate
+*.tfstate.*
+.terragrunt-cache/
+
+# JVM
+.gradle/
+*.jar
+*.war
+*.ear
+
+# .NET
+bin/
+obj/
+*.nupkg
+packages/
+.nuget/
+
+# Ruby
+vendor/bundle/
+.bundle/
+log/
+tmp/
+
+# Flutter
+.dart_tool/
+.flutter-plugins
+.pub-cache/
+
+# Mobile
+android/.gradle/
+android/app/build/
+ios/build/
+DerivedData/
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+Pods/
+Carthage/Build/
+
+# ML/Data
+*.ipynb_checkpoints/
+.wandb/
+mlruns/
+.dvc/cache
+*.parquet
+*.csv
+*.feather
+*.arrow

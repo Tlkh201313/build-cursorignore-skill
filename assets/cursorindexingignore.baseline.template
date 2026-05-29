@@ -1,0 +1,27 @@
+# build-cursorignore
+# --- build-cursorignore ---
+# Baseline .cursorindexingignore — de-index only; files stay openable on request
+# See references/CURSORINDEXINGIGNORE-FORMAT.md
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+poetry.lock
+Pipfile.lock
+uv.lock
+Cargo.lock
+composer.lock
+Gemfile.lock
+go.sum
+
+# Generated code
+*.generated.*
+graphql/generated/
+
+# Snapshots / migration history (if present)
+**/__snapshots__/
+*.snap
+prisma/migrations/
+
+# --- end build-cursorignore ---
