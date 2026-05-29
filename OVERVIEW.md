@@ -1,178 +1,223 @@
-# README.md Improvements Plan
+# build-cursorignore
 
-I will upgrade the README with:
+<p align="center">
+  <strong>Auto-generate `.cursorignore` and `.cursorindexingignore` for any project.</strong><br />
+  Reduce noise, improve indexing, and keep Cursor focused on the files that matter.
+</p>
 
-* **Small visual previews (SM pics)** near key sections:
+<p align="center">
+  <a href="#-quick-start">Quick Start</a> ·
+  <a href="#-why-this-exists">Why This Exists</a> ·
+  <a href="#-how-it-works">How It Works</a> ·
+  <a href="#-supported-stacks">Supported Stacks</a> ·
+  <a href="#-faq">FAQ</a>
+</p>
 
-  * Before/after indexing impact
-  * Generated `.cursorignore` example
-  * Cursor Agent command screenshot/GIF
-  * Repo scan → generated files mini flow
-* **More interaction**:
+<p align="center">
+  <img src="./assets/terminal-sm.gif" alt="build-cursorignore running in Cursor" width="820" />
+</p>
 
-  * Collapsible FAQ (`<details>`)
-  * Copy-paste command blocks
-  * "Try this test" section
-  * Architecture flow diagram using Mermaid
-  * Badges and quick-jump navigation
-* **Stronger OSS presentation**:
+---
 
-  * Better hero section
-  * Clearer problem → solution framing
-  * Cleaner install/run UX
-  * More trust and credibility
+## Why this exists
 
-# OVERVIEW.md (Draft Structure)
+Modern repositories collect a lot of content that is useful for builds but not useful for AI assistance:
 
-## What is build-cursorignore?
-
-A higher-level explanation of what the skill does, why Cursor context gets noisy, and when to use this skill.
-
-## The Problem
-
-Modern repositories contain large amounts of irrelevant content:
-
-* build artifacts
 * dependency folders
-* generated files
-* logs and caches
+* build output
+* generated assets
+* caches
+* logs
 * vendor packages
-* IDE metadata
+* local environment files
+* binary or secret-like files
 
-Without filtering, Cursor may waste context windows and indexing resources on files that do not improve coding assistance.
+When those paths are left unfiltered, Cursor can waste context and indexing effort on low-value files.
 
-## The Solution
+`build-cursorignore` scans your repository, detects the stack or stacks in use, and writes practical ignore rules so Cursor spends less time on noise and more time on the code that matters.
 
-`build-cursorignore` automatically generates optimized:
+<p align="center">
+  <img src="./assets/before-after-sm.png" alt="before and after indexing impact" width="760" />
+</p>
 
-* `.cursorignore`
-* `.cursorindexingignore`
+## What it does
 
-based on your project structure and detected frameworks.
+* Detects common project stacks automatically
+* Generates baseline ignore rules from the repository structure
+* Writes both `.cursorignore` and `.cursorindexingignore`
+* Preserves your custom rules inside managed blocks
+* Works well in monorepos and mixed-language repos
 
-Instead of manually tuning ignore files for every stack, the skill builds a practical baseline automatically.
+## Quick start
 
-## How It Works
+### Install
+
+```bash
+npx skills add Tlkh201313/Build-cursorignore-skill-v2 -a cursor
+```
+
+### Run in Cursor
+
+```bash
+/build-cursorignore
+```
+
+That is usually enough. The skill scans the project, builds the ignore files, and exits.
+
+## What gets generated
+
+### `.cursorignore`
+
+Hard exclusion.
+
+Use this for files and folders that should not be included in Cursor AI context.
+
+Typical examples:
+
+```text
+node_modules/
+vendor/
+dist/
+build/
+.env.local
+*.pem
+*.key
+```
+
+### `.cursorindexingignore`
+
+Indexing exclusion.
+
+Use this for content you do not want indexed, but may still want to reference manually with `@` when needed.
+
+Typical examples:
+
+```text
+coverage/
+.cache/
+.next/
+.nuxt/
+__pycache__/
+*.log
+```
+
+## How it works
 
 ```mermaid
 flowchart LR
-    A[Scan Repository] --> B[Detect Stacks]
-    B --> C[Generate Rules]
-    C --> D[Write Managed Blocks]
-    D --> E[Cursor Re-indexes]
+    A[Scan repository] --> B[Detect stacks]
+    B --> C[Generate rules]
+    C --> D[Write managed blocks]
+    D --> E[Cursor re-indexes]
 ```
 
-### Detection
-
-The skill scans for indicators such as:
+The skill looks for common indicators such as:
 
 * `package.json`
 * `requirements.txt`
+* `pyproject.toml`
 * `Cargo.toml`
 * `go.mod`
 * `Gemfile`
 * framework-specific config files
 
-It supports mixed repositories and monorepos.
+It can handle single projects, nested apps, and monorepos.
 
-### Rule Generation
+## Supported stacks
 
-The skill combines:
+`js_ts`, `next_js`, `nuxt`, `vite`, `remix`, `svelte`, `astro`, `python`, `django`, `flask`, `java`, `kotlin`, `rust`, `go`, `php`, `ruby`, `rails`, `ios_swift`, `android`, `bun`, `deno`, `flutter`, `elixir`, `scala`
 
-1. Universal ignore rules
-2. Framework-specific exclusions
-3. Security-sensitive patterns
-4. Large generated output folders
+## Safe to rerun
 
-Example:
-
-```text
-node_modules/
-dist/
-.next/
-coverage/
-.cache/
-*.log
-```
-
-## Cursor Ignore Types
-
-### `.cursorignore`
-
-A hard exclusion layer.
-
-Files here are intentionally removed from AI context.
-
-Use for:
-
-* dependency trees
-* generated assets
-* binaries
-* secrets
-
-### `.cursorindexingignore`
-
-An indexing optimization layer.
-
-Files are not indexed but can still be referenced manually using `@`.
-
-Use for:
-
-* archived code
-* large docs
-* generated SDKs
-* vendor libraries you occasionally inspect
-
-## Why This Helps
-
-Benefits often include:
-
-* Faster indexing
-* Cleaner `@Codebase` results
-* Lower token waste
-* Better code relevance
-* Less noise in agent reasoning
-
-## Safe By Design
-
-The skill writes inside **managed blocks**, preserving custom rules outside them.
+The generated rules are written inside managed blocks, so your custom lines outside those blocks stay intact.
 
 ```text
 # >>> build-cursorignore:baseline BEGIN >>>
-... generated rules ...
+... autogenerated content ...
 # <<< build-cursorignore:baseline END <<<
 ```
 
-This means you can rerun the skill at any time without losing manual edits.
+Run `/build-cursorignore` again whenever the repository changes.
 
-## Recommended Workflow
+## Try it
 
-1. Install the skill
-2. Run `/build-cursorignore`
-3. Open a fresh Cursor Agent session
-4. Wait for indexing to finish
-5. Validate ignored paths
-6. Rerun after major repo changes
+After running the skill:
 
-## When To Use It
+1. Open a fresh Cursor Agent chat so the files are loaded.
+2. Wait for re-indexing to finish.
+3. Search the codebase for a large ignored folder.
+4. Confirm it no longer dominates results.
 
-Recommended for:
+A quick test is to ask `@Codebase` about a file inside an ignored path such as `node_modules/`. It should not appear unless you reference it directly.
+
+## Recommended use cases
 
 * monorepos
 * enterprise repos
 * large TypeScript apps
+* repos with lots of generated output
 * AI-assisted coding workflows
-* teams using Cursor heavily
-* repos with excessive generated output
+* teams that want cleaner Cursor context
 
-Less useful for:
+## Screenshots and small visuals
 
-* very small repos
-* short-lived prototypes
-* simple single-folder scripts
+Add these assets for a stronger GitHub presentation:
 
-## Philosophy
+* `./assets/terminal-sm.gif` — short run demo
+* `./assets/before-after-sm.png` — indexing noise vs clean context
+* `./assets/flow-sm.png` — repo scan to generated files
 
-Cursor works best when context quality is high.
+A small image block can look like this:
 
-The goal of `build-cursorignore` is not to hide code — it is to reduce noise so Cursor spends more attention on the files that matter most.
+```md
+<p align="center">
+  <img src="./assets/flow-sm.png" alt="build-cursorignore flow" width="760" />
+</p>
+```
+
+## FAQ
+
+<details>
+<summary>Does this overwrite my existing ignore files?</summary>
+
+No. It writes only inside managed blocks and leaves custom content outside those blocks alone.
+
+</details>
+
+<details>
+<summary>Do I need both files?</summary>
+
+Usually yes. `.cursorignore` controls AI context, while `.cursorindexingignore` is better for paths you want excluded from indexing but still accessible when explicitly referenced.
+
+</details>
+
+<details>
+<summary>Can I rerun it after changes?</summary>
+
+Yes. That is the intended workflow. Rerun the skill after major repo changes, framework additions, or dependency shifts.
+
+</details>
+
+<details>
+<summary>What if my repo is tiny?</summary>
+
+You may not need it. The skill is most valuable when a repository contains enough noise that Cursor’s context quality starts to drop.
+
+</details>
+
+<details>
+<summary>Can I customize the generated rules?</summary>
+
+Yes. Keep your manual edits outside the managed blocks, or add custom rules after generation if you want to extend the baseline.
+
+</details>
+
+## Contributing
+
+Issues and pull requests are welcome.
+
+If you add support for a new stack, include a reproducible example and make sure the generated rules are safe for reruns.
+
+## License
+
+MIT
