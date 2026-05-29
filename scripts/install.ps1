@@ -1,5 +1,5 @@
 # build-cursorignore installer for Windows
-# Usage: irm https://raw.githubusercontent.com/YOUR_USER/build-cursorignore/main/scripts/install.ps1 | iex
+# Usage: irm https://raw.githubusercontent.com/Tlkh201313/build-cursorignore-skill/master/scripts/install.ps1 | iex
 
 $ErrorActionPreference = "Stop"
 
@@ -22,36 +22,54 @@ if (Test-Path $INSTALL_DIR) {
     Remove-Item -Recurse -Force $INSTALL_DIR
 }
 
-# Clone the repository
-Write-Host "Cloning repository..." -ForegroundColor Cyan
+# Try git clone first
+$useGit = $false
 try {
-    git clone --depth 1 $REPO_URL $INSTALL_DIR 2>$null
-    if ($LASTEXITCODE -ne 0) {
-        throw "git clone failed"
+    $null = Get-Command git -ErrorAction Stop
+    $useGit = $true
+} catch {}
+
+if ($useGit) {
+    Write-Host "Cloning repository..." -ForegroundColor Cyan
+    & git clone --depth 1 $REPO_URL $INSTALL_DIR 2>$null
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "`n✓ Installation successful!" -ForegroundColor Green
+        Write-Host "`nNext steps:" -ForegroundColor Cyan
+        Write-Host "1. Restart Cursor" -ForegroundColor White
+        Write-Host "2. Open your app repo in Cursor Agent" -ForegroundColor White
+        Write-Host "3. Type /build-cursorignore and press Enter" -ForegroundColor White
+        Write-Host "`nInstalled to: $INSTALL_DIR" -ForegroundColor Gray
+        exit 0
     }
-} catch {
-    Write-Host "Git not found. Downloading zip instead..." -ForegroundColor Yellow
-    
-    # Download zip as fallback
-    $zipUrl = "$REPO_URL/archive/refs/heads/master.zip"
-    $zipPath = "$env:TEMP\$SKILL_NAME.zip"
-    $extractPath = "$env:TEMP\$SKILL_NAME-extract"
-    
-    # Clean up any previous attempts
-    Remove-Item -Path $zipPath -Force -ErrorAction SilentlyContinue
-    Remove-Item -Path $extractPath -Recurse -Force -ErrorAction SilentlyContinue
-    
+    Write-Host "Git clone failed, trying download..." -ForegroundColor Yellow
+}
+
+# Download zip as fallback
+Write-Host "Downloading zip..." -ForegroundColor Cyan
+$zipUrl = "$REPO_URL/archive/refs/heads/master.zip"
+$zipPath = "$env:TEMP\$SKILL_NAME.zip"
+$extractPath = "$env:TEMP\$SKILL_NAME-extract"
+
+# Clean up any previous attempts
+Remove-Item -Path $zipPath -Force -ErrorAction SilentlyContinue
+Remove-Item -Path $extractPath -Recurse -Force -ErrorAction SilentlyContinue
+
+try {
     Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath
     Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force
     
-    # Create install directory
-    New-Item -ItemType Directory -Force -Path $INSTALL_DIR | Out-Null
-    
-    # Move contents to install directory
+    # Find the extracted folder (GitHub creates repo-branch folder)
     $extractedDir = Get-ChildItem -Path $extractPath -Directory | Select-Object -First 1
-    Copy-Item -Path "$($extractedDir.FullName)\*" -Destination $INSTALL_DIR -Recurse -Force
     
-    # Cleanup
+    if ($extractedDir) {
+        # Create install directory and copy contents
+        New-Item -ItemType Directory -Force -Path $INSTALL_DIR | Out-Null
+        Copy-Item -Path "$($extractedDir.FullName)\*" -Destination $INSTALL_DIR -Recurse -Force
+    } else {
+        throw "No folder found in zip"
+    }
+} finally {
+    # Cleanup temp files
     Remove-Item -Path $zipPath -Force -ErrorAction SilentlyContinue
     Remove-Item -Path $extractPath -Recurse -Force -ErrorAction SilentlyContinue
 }
