@@ -5,40 +5,74 @@ description: Scans the current project and writes .cursorignore and .cursorindex
 
 # Build .cursorignore
 
-**Install this bundle does not write ignore files.** Copying the skill to `~/.cursor/skills/build-cursorignore/` is setup only. Ignore files are created **later**, when the user runs `/build-cursorignore` on their **app repo**.
+Run on the **target app repo** — never on this skill's source tree.
 
-Follow [references/ignore-checklist.md](references/ignore-checklist.md):
+## Single phase — scan, write, report
 
-1. **Single phase:** scan repo, write files, show report — all in one go.
+1. **Scan** — list top-level files/folders, read `.gitignore` to build skip-list
+2. **Write** — create `.cursorignore` and `.cursorindexingignore` with matching patterns
+3. **Report** — show what was blocked and top token savings
 
-Never write ignore files into this skill’s source tree (`SKILL.md` + `references/` + `assets/` at repo root).
-
-## Authority (read in order)
-
-| Step | Document |
-|------|----------|
-| Workflow | [references/ignore-checklist.md](references/ignore-checklist.md) |
-| Cursor-specific | [references/cursor-notes.md](references/cursor-notes.md) |
-| Detect stack | [references/stack-signals.md](references/stack-signals.md) → [references/annexes/INDEX.md](references/annexes/INDEX.md) |
-| Universal patterns | [references/patterns-catalog.md](references/patterns-catalog.md) |
-| Skip `.gitignore` dupes | [references/GITIGNORE-DEDUPE.md](references/GITIGNORE-DEDUPE.md) |
-| Write `.cursorignore` | [references/CURSORIGNORE-FORMAT.md](references/CURSORIGNORE-FORMAT.md) (Phase 2 only) |
-| Write `.cursorindexingignore` | [references/CURSORINDEXINGIGNORE-FORMAT.md](references/CURSORINDEXINGIGNORE-FORMAT.md) (Phase 2 only) |
-| Chat closeout | [references/examples/report-example.md](references/examples/report-example.md) |
-| File importance | [references/importance-tiers.md](references/importance-tiers.md) |
-
-Load paths: `references/…` next to this skill, or `~/.cursor/skills/build-cursorignore/references/…`.
-
-Templates (reference only until Phase 2): [assets/cursorignore.baseline.template](assets/cursorignore.baseline.template), [assets/cursorindexingignore.baseline.template](assets/cursorindexingignore.baseline.template).
-
-## Two files (summary)
+## Two files
 
 | File | Effect |
 |------|--------|
-| `.cursorignore` | Fully blocked — agent cannot open even if asked |
+| `.cursorignore` | Fully blocked — agent cannot open |
 | `.cursorindexingignore` | De-indexed — still openable on request |
 
-- Cursor already honors `.gitignore` — never duplicate those patterns.
-- When unsure, prefer `.cursorindexingignore` over `.cursorignore`.
+- Cursor already honors `.gitignore` — never duplicate those patterns
+- When unsure, prefer `.cursorindexingignore` over `.cursorignore`
+- Nothing under `src/`, `app/`, tests, or configs gets hidden
 
-Human overview: [OVERVIEW.md](OVERVIEW.md) · Install: [references/install.md](references/install.md).
+## Patterns (apply only if files exist)
+
+### Always `.cursorignore`
+- `node_modules/`, `.pnpm-store/`, `.venv/`, `vendor/`, `__pycache__/`
+- `dist/`, `build/`, `out/`, `.next/`, `.nuxt/`, `target/`
+- `.cache/`, `.turbo/`, `.nx/`, `.eslintcache`
+- `*.log`, `logs/`, `*.tmp`
+- `*.exe`, `*.dll`, `*.so`, `*.dylib`, `*.wasm`
+- `*.png`, `*.jpg`, `*.pdf`, `*.zip`, `*.map`, `*.min.js`, `*.min.css`
+
+### Always `.cursorindexingignore`
+- `*.lock`, `*.lockb` (lock files)
+- `*.snap`, `__snapshots__/` (test snapshots)
+- `*.generated.*`, `*.d.ts` (generated code)
+- `migrations/`, `prisma/migrations/` (database migrations)
+
+### Conditional (detect stack first)
+- `.yarn/cache/`, `.yarn/install-state.gz` (Yarn Berry)
+- `.bun/`, `bun.lockb` (Bun)
+- `.deno/`, `deno.lock` (Deno)
+- `.terraform/`, `*.tfstate` (Terraform)
+- `.gradle/`, `*.jar` (JVM)
+- `bin/`, `obj/`, `*.nupkg` (.NET)
+- `vendor/bundle/` (Ruby)
+- `.dart_tool/` (Flutter)
+- `android/.gradle/`, `ios/build/`, `DerivedData/`, `Pods/` (Mobile)
+
+## Write format
+
+Both files use gitignore syntax. Mark skill sections:
+```
+# --- build-cursorignore ---
+<patterns>
+# --- /build-cursorignore ---
+```
+
+Add `!` re-includes for protected paths:
+```
+!src/
+!app/
+!*.test.*
+!*.config.*
+```
+
+## Report format
+
+```
+.cursorignore — X new patterns
+.cursorindexingignore — Y new patterns
+Top savings: [list 3 heaviest paths]
+Restart Cursor to apply.
+```
