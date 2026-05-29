@@ -1,97 +1,197 @@
-# Build .cursorignore Skill
+# build-cursorignore
 
-Your agent is drowning in junk.
+> Auto-generate `.cursorignore` and `.cursorindexingignore` for any project. One command, zero config.
 
-It opens `node_modules`. It indexes a 4 MB lock file. It reads a minified bundle, a coverage report, a folder of PNGs — and burns thousands of tokens doing it. Every one of those tokens was supposed to go toward understanding *your* code. Instead it went to dead weight.
-
-You can fix this by hand. Most people don't, because Cursor's two ignore files have a subtle split — `.cursorignore` makes a file **completely invisible to the agent**, while `.cursorindexingignore` only **de-indexes** it (the agent can still open it on request). Get that wrong and you either waste context or hide the one file you needed.
-
-**Build .cursorignore** does it for you. One command scans your repo, reads your existing `.gitignore` so it never writes a redundant line, sorts the noise into the right ignore file, and protects the things you actually edit. [Install](references/install.md) the skill to `~/.cursor/skills/build-cursorignore/`, open your repo in Cursor Agent, and run **`/build-cursorignore`**.
+[![Cursor Compatible](https://img.shields.io/badge/Cursor-Agent-blue?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyIDJMMiA3bDEwIDUgMTAtNS0xMC01ek0yIDE3bDEwIDUgMTAtNU0yIDEybDEwIDUgMTAtNSIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg==)](https://cursor.sh)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![npx skills](https://img.shields.io/badge/npx-skills-764abc?logo=nodedotjs)](https://github.com/vercel-labs/skills)
 
 ---
 
-## Your code stays reachable
+## What It Does
 
-The skill is **conservative by default**. Dependencies, build output, and binaries go in `.cursorignore`. Lock files, generated code, migrations, and snapshots go in `.cursorindexingignore` so they leave the index but stay one request away.
+Scans your project root, detects the tech stack (24 stacks), and writes two ignore files that block junk from Cursor's AI context. Reduces indexing time and token consumption across **all models** — Claude, GPT-4o, Gemini.
 
-Nothing important gets hidden. Test files, configs you edit, `.env.example`, source markdown, and everything under `src/`/`app/` are protected — broad globs get `!` re-includes per [CURSORIGNORE-FORMAT.md](references/CURSORIGNORE-FORMAT.md).
-
-It reads your `.gitignore` first and **skips every pattern already covered there**.
-
----
-
-## What it writes
-
-| Output | What it is |
-|--------|------------|
-| **`.cursorignore`** | Dead weight: dependencies, build output, caches, binaries, logs — fully hidden from the agent |
-| **`.cursorindexingignore`** | Rarely-needed: lock files, generated code, snapshots, migrations — de-indexed, still readable |
-| **Report (chat)** | Net-new paths blocked, what moved where, and the 3 heaviest token wins |
-
-Details: [OVERVIEW.md](OVERVIEW.md) · [SKILL.md](SKILL.md)
+| Output | Effect |
+|--------|--------|
+| `.cursorignore` | **Hard block** — AI cannot see or index these files |
+| `.cursorindexingignore` | **Soft block** — excluded from indexing, but you can `@` them manually |
 
 ---
 
-## Quick start
+## Quick Start
 
-**Install the skill (no ignore files yet)**
+### One-liner (copy into any AI agent)
 
-**Windows (PowerShell):**
-```powershell
-irm https://raw.githubusercontent.com/Tlkh201313/build-cursorignore-skill/master/scripts/install.ps1 | iex
+```
+npx skills add Tlkh201313/Build-cursorignore-skill-v2 -a cursor && echo "Run /build-cursorignore in Cursor Agent"
 ```
 
-**macOS / Linux (Bash):**
+### Or install manually
+
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Tlkh201313/build-cursorignore-skill/master/scripts/install.sh | bash
+npx skills add Tlkh201313/Build-cursorignore-skill-v2 -a cursor
 ```
 
-Or [manual install](references/install.md) — flat copy to `~/.cursor/skills/build-cursorignore/`
+Then in Cursor Agent:
 
-**Then restart Cursor**
-
-**Update the skill (pull latest changes)**
-
-**Windows (PowerShell):**
-```powershell
-irm https://raw.githubusercontent.com/Tlkh201313/build-cursorignore-skill/master/scripts/update.ps1 | iex
+```
+/build-cursorignore
 ```
 
-**macOS / Linux (Bash):**
-```bash
-curl -fsSL https://raw.githubusercontent.com/Tlkh201313/build-cursorignore-skill/master/scripts/update.sh | bash
-```
-
-**Generate ignore files later (on your app repo)**
-
-3. Open **your app** repo root in Cursor **Agent**
-4. `/build-cursorignore` — scan + plan in chat, then write after you say OK
-5. Reindex when prompted, or restart Cursor
-
-Do not run `/build-cursorignore` on this skill’s source repo unless you are dogfooding on purpose.
-
-Plain English does not load this skill. New to Cursor Agent? [Quickstart](https://cursor.com/docs/get-started/quickstart).
-
-**Check:** nothing under `src/`/`app/` was hidden; lock files in `.cursorindexingignore` (not `.cursorignore`); no `.gitignore` duplicates — [troubleshooting.md](references/troubleshooting.md)
+Done. Open a **new chat** to activate.
 
 ---
 
-## Uninstall
+## Table of Contents
 
-**Windows (PowerShell):**
-```powershell
-irm https://raw.githubusercontent.com/Tlkh201313/build-cursorignore-skill/master/scripts/uninstall.ps1 | iex
-```
+- [Install](#install)
+- [Run](#run)
+- [After Running](#after-running)
+- [Verify It Works](#verify-it-works)
+- [What Gets Blocked](#what-gets-blocked)
+- [Supported Stacks](#supported-stacks)
+- [Re-run Safe](#re-run-safe)
+- [Update / Uninstall](#update--uninstall)
+- [FAQ](#faq)
 
-**macOS / Linux (Bash):**
+---
+
+## Install
+
+### Method 1: `npx skills add` (Recommended)
+
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Tlkh201313/build-cursorignore-skill/master/scripts/uninstall.sh | bash
+npx skills add Tlkh201313/Build-cursorignore-skill-v2 -a cursor
 ```
 
-Or manually delete `~/.cursor/skills/build-cursorignore/` and restart Cursor.
+### Method 2: Manual Git Clone
+
+```bash
+git clone --depth 1 https://github.com/Tlkh201313/Build-cursorignore-skill-v2.git ~/.cursor/skills/build-cursorignore
+```
+
+---
+
+## Run
+
+Open Cursor Agent and type:
+
+```
+/build-cursorignore
+```
+
+Single pass — scans, detects stack, writes both files. No prompts, no confirmation.
+
+---
+
+## After Running
+
+1. **Open a new Agent chat** — ignore files load on session start
+2. **Wait for re-indexing** — ~30s on small repos, a few minutes on large ones
+3. No restart needed
+
+---
+
+## Verify It Works
+
+### Check indexing status
+
+1. **Cursor Settings** → `Ctrl+Shift+J` (Windows) / `Cmd+Shift+J` (Mac)
+2. Go to **Indexing** (or **Features → Codebase Indexing**)
+3. Confirm indexed file count is lower than total
+
+### Smoke test
+
+In a new chat, ask `@Codebase` about something inside an ignored path (e.g., `node_modules/`). It should **not** appear in results.
+
+> To force a file back in: `@` it directly. Works for `.cursorindexingignore` paths only.
+
+---
+
+## What Gets Blocked
+
+### Always blocked (universal baseline)
+
+| Category | Examples |
+|----------|----------|
+| Dependencies | `node_modules/`, `vendor/`, `bower_components/` |
+| Build output | `dist/`, `build/`, `.next/`, `.nuxt/`, `target/` |
+| Caches | `.cache/`, `__pycache__/`, `.turbo/`, `.gradle/` |
+| Logs | `*.log`, `logs/`, `npm-debug.log*` |
+| Coverage | `coverage/`, `.nyc_output/`, `htmlcov/` |
+| Secrets | `.env.local`, `*.pem`, `*.key`, `secrets.json` |
+| OS junk | `.DS_Store`, `Thumbs.db`, `desktop.ini` |
+| Large binaries | `*.mp4`, `*.zip`, `*.tar.gz` |
+
+### Stack-specific (auto-detected)
+
+| Stack | Extra patterns |
+|-------|---------------|
+| Next.js | `.next/`, `*.tsbuildinfo` |
+| Nuxt | `.nuxt/`, `.output/` |
+| Python/Django | `db.sqlite3`, `staticfiles/`, `__pycache__/` |
+| Rust | `target/` |
+| Android | `.gradle/`, `build/`, `local.properties` |
+| iOS/Swift | `Pods/`, `DerivedData/`, `xcuserdata/` |
+
+See [assets/](assets/) for full template content.
+
+---
+
+## Supported Stacks
+
+`js_ts` · `next_js` · `nuxt` · `vite` · `remix` · `svelte` · `astro` · `python` · `django` · `flask` · `java` · `kotlin` · `rust` · `go` · `php` · `ruby` · `rails` · `ios_swift` · `android` · `bun` · `deno` · `flutter` · `elixir` · `scala`
+
+Monorepos: detects `package.json` in subfolders, merges all stacks.
+
+---
+
+## Re-run Safe
+
+Uses managed blocks — your custom lines outside the block are never touched.
+
+```
+# >>> build-cursorignore:baseline BEGIN >>>
+... (auto-generated content) ...
+# <<< build-cursorignore:baseline END <<<
+```
+
+Run `/build-cursorignore` anytime to refresh the baseline.
+
+---
+
+## Update / Uninstall
+
+```bash
+# Update
+npx skills update build-cursorignore
+
+# Uninstall
+npx skills remove build-cursorignore
+```
+
+---
+
+## FAQ
+
+**Q: Does this work with all Cursor models?**
+Yes. Ignore files are model-agnostic — Claude, GPT-4o, Gemini all respect them.
+
+**Q: Will this delete my existing `.cursorignore`?**
+No. It only writes inside managed blocks. Your custom lines are safe.
+
+**Q: Can I still `@` a blocked file?**
+Only files in `.cursorindexingignore`. Files in `.cursorignore` are hard-blocked.
+
+**Q: Do I need to duplicate `.gitignore` entries?**
+No. Cursor auto-respects `.gitignore`.
+
+**Q: Terminal commands can still read blocked files?**
+Yes. `.cursorignore` only blocks AI context and indexing, not terminal access.
 
 ---
 
 ## License
 
-MIT — [LICENSE](LICENSE)
+MIT
