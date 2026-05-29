@@ -37,12 +37,19 @@ try {
     $zipPath = "$env:TEMP\$SKILL_NAME.zip"
     $extractPath = "$env:TEMP\$SKILL_NAME-extract"
     
+    # Clean up any previous attempts
+    Remove-Item -Path $zipPath -Force -ErrorAction SilentlyContinue
+    Remove-Item -Path $extractPath -Recurse -Force -ErrorAction SilentlyContinue
+    
     Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath
     Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force
     
+    # Create install directory
+    New-Item -ItemType Directory -Force -Path $INSTALL_DIR | Out-Null
+    
     # Move contents to install directory
     $extractedDir = Get-ChildItem -Path $extractPath -Directory | Select-Object -First 1
-    Move-Item -Path "$($extractedDir.FullName)\*" -Destination $INSTALL_DIR
+    Copy-Item -Path "$($extractedDir.FullName)\*" -Destination $INSTALL_DIR -Recurse -Force
     
     # Cleanup
     Remove-Item -Path $zipPath -Force -ErrorAction SilentlyContinue
