@@ -2,166 +2,97 @@
 
 > Auto-generate `.cursorignore` and `.cursorindexingignore` for any project. One command, zero config.
 
-[![Cursor Compatible](https://img.shields.io/badge/Cursor-Agent-blue?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyIDJMMiA3bDEwIDUgMTAtNS0xMC01ek0yIDE3bDEwIDUgMTAtNU0yIDEybDEwIDUgMTAtNSIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg==)](https://cursor.sh)
+[![Cursor Compatible](https://img.shields.io/badge/Cursor-Compatible-black?logo=cursor)](https://cursor.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![npx skills](https://img.shields.io/badge/npx-skills-764abc?logo=nodedotjs)](https://github.com/vercel-labs/skills)
 
----
+## Why this exists
 
-## What It Does
+Large repos are noisy. Generated files, caches, build artifacts, logs, and vendor folders can slow indexing and waste context.
 
-Scans your project root, detects the tech stack (24 stacks), and writes two ignore files that block junk from Cursor's AI context. Reduces indexing time and token consumption across **all models** — Claude, GPT-4o, Gemini.
+`build-cursorignore` scans your project, detects the stack, and writes the right ignore files so Cursor spends less time on junk and more time on code that matters.
 
-| Output | Effect |
-|--------|--------|
-| `.cursorignore` | **Hard block** — AI cannot see or index these files |
-| `.cursorindexingignore` | **Soft block** — excluded from indexing, but you can `@` them manually |
+## What it does
 
----
+* Detects common project stacks automatically
+* Generates a baseline set of ignore rules
+* Writes both `.cursorignore` and `.cursorindexingignore`
+* Preserves your custom rules inside managed blocks
+* Works well for monorepos and multi-stack projects
 
-## Quick Start
+## Quick start
 
-### One-liner (copy into any AI agent)
-
-```
-npx skills add Tlkh201313/Build-cursorignore-skill-v2 -a cursor && echo "Run /build-cursorignore in Cursor Agent"
-```
-
-### Or install manually
+### Install
 
 ```bash
 npx skills add Tlkh201313/Build-cursorignore-skill-v2 -a cursor
 ```
 
-Then in Cursor Agent:
+### Run in Cursor Agent
 
-```
+```bash
 /build-cursorignore
 ```
 
-Done. Open a **new chat** to activate.
+That is usually enough. The skill scans the repo, builds the ignore files, and exits.
 
----
+## What gets generated
 
-## Table of Contents
+### `.cursorignore`
 
-- [Install](#install)
-- [Run](#run)
-- [After Running](#after-running)
-- [Verify It Works](#verify-it-works)
-- [What Gets Blocked](#what-gets-blocked)
-- [Supported Stacks](#supported-stacks)
-- [Re-run Safe](#re-run-safe)
-- [Update / Uninstall](#update--uninstall)
-- [FAQ](#faq)
+Hard block. Files and folders listed here are excluded from Cursor AI context.
 
----
+### `.cursorindexingignore`
 
-## Install
+Soft block. These paths are excluded from indexing, but you can still reference them directly with `@` when needed.
 
-### Method 1: `npx skills add` (Recommended)
+## Example output
 
-```bash
-npx skills add Tlkh201313/Build-cursorignore-skill-v2 -a cursor
+```text
+# Universal baseline
+node_modules/
+vendor/
+dist/
+build/
+.next/
+.nuxt/
+.cache/
+__pycache__/
+*.log
+coverage/
+.env.local
+*.pem
+*.key
+.DS_Store
+Thumbs.db
 ```
 
-### Method 2: Manual Git Clone
+## Supported stacks
 
-```bash
-git clone --depth 1 https://github.com/Tlkh201313/Build-cursorignore-skill-v2.git ~/.cursor/skills/build-cursorignore
-```
+`js_ts`, `next_js`, `nuxt`, `vite`, `remix`, `svelte`, `astro`, `python`, `django`, `flask`, `java`, `kotlin`, `rust`, `go`, `php`, `ruby`, `rails`, `ios_swift`, `android`, `bun`, `deno`, `flutter`, `elixir`, `scala`
 
----
+Monorepos are supported. The skill can detect `package.json` files in subfolders and merge the discovered stacks.
 
-## Run
+## Safe to rerun
 
-Open Cursor Agent and type:
+The generated files use managed blocks, so your custom lines outside those blocks are left alone.
 
-```
-/build-cursorignore
-```
-
-Single pass — scans, detects stack, writes both files. No prompts, no confirmation.
-
----
-
-## After Running
-
-1. **Open a new Agent chat** — ignore files load on session start
-2. **Wait for re-indexing** — ~30s on small repos, a few minutes on large ones
-3. No restart needed
-
----
-
-## Verify It Works
-
-### Check indexing status
-
-1. **Cursor Settings** → `Ctrl+Shift+J` (Windows) / `Cmd+Shift+J` (Mac)
-2. Go to **Indexing** (or **Features → Codebase Indexing**)
-3. Confirm indexed file count is lower than total
-
-### Smoke test
-
-In a new chat, ask `@Codebase` about something inside an ignored path (e.g., `node_modules/`). It should **not** appear in results.
-
-> To force a file back in: `@` it directly. Works for `.cursorindexingignore` paths only.
-
----
-
-## What Gets Blocked
-
-### Always blocked (universal baseline)
-
-| Category | Examples |
-|----------|----------|
-| Dependencies | `node_modules/`, `vendor/`, `bower_components/` |
-| Build output | `dist/`, `build/`, `.next/`, `.nuxt/`, `target/` |
-| Caches | `.cache/`, `__pycache__/`, `.turbo/`, `.gradle/` |
-| Logs | `*.log`, `logs/`, `npm-debug.log*` |
-| Coverage | `coverage/`, `.nyc_output/`, `htmlcov/` |
-| Secrets | `.env.local`, `*.pem`, `*.key`, `secrets.json` |
-| OS junk | `.DS_Store`, `Thumbs.db`, `desktop.ini` |
-| Large binaries | `*.mp4`, `*.zip`, `*.tar.gz` |
-
-### Stack-specific (auto-detected)
-
-| Stack | Extra patterns |
-|-------|---------------|
-| Next.js | `.next/`, `*.tsbuildinfo` |
-| Nuxt | `.nuxt/`, `.output/` |
-| Python/Django | `db.sqlite3`, `staticfiles/`, `__pycache__/` |
-| Rust | `target/` |
-| Android | `.gradle/`, `build/`, `local.properties` |
-| iOS/Swift | `Pods/`, `DerivedData/`, `xcuserdata/` |
-
-See [assets/](assets/) for full template content.
-
----
-
-## Supported Stacks
-
-`js_ts` · `next_js` · `nuxt` · `vite` · `remix` · `svelte` · `astro` · `python` · `django` · `flask` · `java` · `kotlin` · `rust` · `go` · `php` · `ruby` · `rails` · `ios_swift` · `android` · `bun` · `deno` · `flutter` · `elixir` · `scala`
-
-Monorepos: detects `package.json` in subfolders, merges all stacks.
-
----
-
-## Re-run Safe
-
-Uses managed blocks — your custom lines outside the block are never touched.
-
-```
+```text
 # >>> build-cursorignore:baseline BEGIN >>>
-... (auto-generated content) ...
+... autogenerated content ...
 # <<< build-cursorignore:baseline END <<<
 ```
 
-Run `/build-cursorignore` anytime to refresh the baseline.
+Run `/build-cursorignore` again whenever your project changes.
 
----
+## Verify it worked
 
-## Update / Uninstall
+1. Open a new Cursor Agent chat so the ignore files are loaded for the session.
+2. Wait for re-indexing to finish.
+3. Confirm that large ignored folders no longer appear in codebase search.
+
+A simple test is to ask `@Codebase` about something inside an ignored path such as `node_modules/`. It should not be returned unless you reference it directly.
+
+## Update or uninstall
 
 ```bash
 # Update
@@ -171,26 +102,20 @@ npx skills update build-cursorignore
 npx skills remove build-cursorignore
 ```
 
----
-
 ## FAQ
 
-**Q: Does this work with all Cursor models?**
-Yes. Ignore files are model-agnostic — Claude, GPT-4o, Gemini all respect them.
+**Does this replace my existing ignore files?**
+No. It writes inside managed blocks and leaves your custom lines intact.
 
-**Q: Will this delete my existing `.cursorignore`?**
-No. It only writes inside managed blocks. Your custom lines are safe.
+**Do I need to duplicate `.gitignore` entries?**
+Usually no. Cursor respects `.gitignore` automatically.
 
-**Q: Can I still `@` a blocked file?**
-Only files in `.cursorindexingignore`. Files in `.cursorignore` are hard-blocked.
+**Can I still access a blocked file?**
+Files in `.cursorindexingignore` can still be referenced directly with `@`. Files in `.cursorignore` are hard-blocked.
 
-**Q: Do I need to duplicate `.gitignore` entries?**
-No. Cursor auto-respects `.gitignore`.
+## Contributing
 
-**Q: Terminal commands can still read blocked files?**
-Yes. `.cursorignore` only blocks AI context and indexing, not terminal access.
-
----
+Issues and pull requests are welcome.
 
 ## License
 
