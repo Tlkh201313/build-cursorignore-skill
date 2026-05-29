@@ -31,7 +31,10 @@ try {
 
 if ($useGit) {
     Write-Host "Cloning repository..." -ForegroundColor Cyan
+    $prevEAP = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
     $gitOutput = & git clone --depth 1 $REPO_URL $INSTALL_DIR 2>&1
+    $ErrorActionPreference = $prevEAP
     if ($LASTEXITCODE -eq 0) {
         Write-Host "`n[OK] Installation successful!" -ForegroundColor Green
         Write-Host "`nNext steps:" -ForegroundColor Cyan
