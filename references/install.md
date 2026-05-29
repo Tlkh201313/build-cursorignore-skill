@@ -28,12 +28,12 @@ curl -fsSL https://raw.githubusercontent.com/Tlkh201313/build-cursorignore/main/
 
 ```bash
 # Clone directly into Cursor skills directory
-git clone --depth 1 https://github.com/Tlkh201313/build-cursorignore ~/.cursor/skills/build-cursorignore
+git clone --depth 1 https://github.com/Tlkh201313/build-cursorignore-skill ~/.cursor/skills/build-cursorignore
 ```
 
 ### Option 2: Download ZIP
 
-1. Download: [main.zip](https://github.com/YOUR_USER/build-cursorignore/archive/refs/heads/main.zip)
+1. Download: [main.zip](https://github.com/Tlkh201313/build-cursorignore-skill/archive/refs/heads/main.zip)
 2. Extract to `~/.cursor/skills/build-cursorignore/`
 3. Ensure `SKILL.md` is at the root of the folder
 
@@ -77,6 +77,20 @@ If it doesn't appear, see [troubleshooting.md](troubleshooting.md).
 ---
 
 ## Uninstall
+
+### Quick Uninstall (Recommended)
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/Tlkh201313/build-cursorignore-skill/main/scripts/uninstall.ps1 | iex
+```
+
+**macOS / Linux (Bash):**
+```bash
+curl -fsSL https://raw.githubusercontent.com/Tlkh201313/build-cursorignore-skill/main/scripts/uninstall.sh | bash
+```
+
+### Manual Uninstall
 
 Delete the skill folder:
 
