@@ -33,7 +33,7 @@ try {
     Write-Host "Git not found. Downloading zip instead..." -ForegroundColor Yellow
     
     # Download zip as fallback
-    $zipUrl = "$REPO_URL/archive/refs/heads/main.zip"
+    $zipUrl = "$REPO_URL/archive/refs/heads/master.zip"
     $zipPath = "$env:TEMP\$SKILL_NAME.zip"
     $extractPath = "$env:TEMP\$SKILL_NAME-extract"
     

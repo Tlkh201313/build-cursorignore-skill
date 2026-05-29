@@ -35,7 +35,7 @@ fi
 if [ "$INSTALL_VIA_DOWNLOAD" = true ]; then
     echo "Downloading..."
     TEMP_DIR=$(mktemp -d)
-    ZIP_URL="$REPO_URL/archive/refs/heads/main.zip"
+    ZIP_URL="$REPO_URL/archive/refs/heads/master.zip"
     
     if command -v curl &> /dev/null; then
         curl -fsSL "$ZIP_URL" -o "$TEMP_DIR/$SKILL_NAME.zip"
